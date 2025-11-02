@@ -1,0 +1,119 @@
+project:
+  name: synhat-demo
+  seed: 1234
+  device: cuda
+
+data:
+  city: demo
+  raw_path: data/sample_synhat
+  processed_dir: data/sample_synhat
+  slot_minutes: 60
+  fine_minutes: 15
+  duration_days: 1
+  num_workers: 0
+  candidate_topk: 8
+  poi_time_bins: 24
+  stage_files:
+    stage1:
+      train: stage1_train.npz
+      val: stage1_val.npz
+      test: stage1_test.npz
+    stage2:
+      train: stage2_train.npz
+      val: stage2_val.npz
+      test: stage2_test.npz
+    stage3:
+      train: stage2_events_sample.npz
+      val: stage2_events_sample.npz
+      test: stage2_events_sample.npz
+    metadata: stage_metadata.json
+    poi_catalog: poi_catalog.npz
+
+stage1:
+  model:
+    base_channels: 32
+    scales: 2
+    jitter_blocks: 1
+    drift_blocks: 1
+    dropout: 0.1
+    embedding_dim: 128
+    time_embed_dim: 128
+    norm_groups: 4
+  diffusion:
+    timesteps: 200
+    beta_schedule: cosine
+    beta_start: 0.0001
+    beta_end: 0.02
+    ddim_steps: 20
+  training:
+    batch_size: 4
+    num_epochs: 20
+    learning_rate: 0.0005
+    weight_decay: 0.0
+    grad_clip: 1.0
+    ema: false
+    ema_decay: 0.0
+    amp: false
+    log_interval: 10
+    val_interval: 5
+    save_interval: 5
+    stay_bce_weight: 0.0
+    use_token_weighting: false
+    output_dir: outputs/stage1
+
+stage2:
+  model:
+    base_channels: 32
+    scales: 2
+    jitter_blocks: 1
+    drift_blocks: 1
+    dropout: 0.1
+    embedding_dim: 96
+    time_embed_dim: 128
+    norm_groups: 4
+  diffusion:
+    timesteps: 200
+    beta_schedule: cosine
+    beta_start: 0.0001
+    beta_end: 0.02
+    ddim_steps: 20
+  training:
+    batch_size: 4
+    num_epochs: 20
+    learning_rate: 0.001
+    weight_decay: 0.0
+    grad_clip: 1.0
+    ema: false
+    ema_decay: 0.0
+    amp: false
+    log_interval: 10
+    val_interval: 5
+    save_interval: 5
+    coord_augmentation_std: 0.05
+    use_token_weighting: false
+    output_dir: outputs/stage2
+
+stage3:
+  model:
+    hidden_dim: 128
+    num_layers: 2
+    dropout: 0.1
+
+inference:
+  num_samples: 64
+  stage1:
+    ddim_steps: 20
+    eta: 0.0
+    batch_size: 16
+    stay_threshold: 0.5
+  stage2:
+    ddim_steps: 20
+    eta: 0.0
+    batch_size: 16
+    indicator_threshold: 0.7
+    per_slot_max_events: 4
+    max_events_per_day: 16
+    min_global_mins: 30
+  stage3:
+    spatial_radius_km: 1.5
+  output_dir: outputs

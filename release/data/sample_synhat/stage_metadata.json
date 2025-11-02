@@ -1,0 +1,35 @@
+{
+  "city": "demo",
+  "slot_minutes": 60,
+  "fine_minutes": 15,
+  "fine_steps": 4,
+  "duration_days": 1,
+  "num_slots": 24,
+  "slots_per_day": 24,
+  "normalization": {
+    "mean": [
+      40.0,
+      -73.0
+    ],
+    "std": [
+      0.02,
+      0.02
+    ]
+  },
+  "split_sizes": {
+    "stage1": {
+      "train": 12,
+      "val": 4,
+      "test": 4
+    },
+    "stage2": {
+      "train": 16,
+      "val": 4,
+      "test": 4
+    }
+  },
+  "origin": {
+    "lat": 40.0,
+    "lon": -73.0
+  }
+}
